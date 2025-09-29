@@ -12,7 +12,7 @@ dotenv.config();
 const app = express();
 
 app.use(cookieParser());
-app.use(cors({ origin: "https://sync-space-zeta.vercel.app/",credentials: true }));
+app.use(cors({ origin: "http://localhost:5173/",credentials: true }));
 app.use(express.json());
 app.use(passport.initialize());
 
@@ -34,7 +34,7 @@ app.get("/auth/github/callback",
       maxAge: 24 * 60 * 60 * 1000 // 1 day
     })
 
-    res.redirect(`https://sync-space-zeta.vercel.app/home`);
+    res.redirect(`http://localhost:5173/home`);
   })
 
   app.get("/profile",verifyToken,(req,res)=>{res.json({username:req.user.username})})
