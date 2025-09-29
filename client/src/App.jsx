@@ -1,9 +1,17 @@
-import React from 'react'
-import Hero from './pages/Hero'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Hero from "./pages/Hero";
+import Home from "./pages/Home";
 const App = () => {
   return (
-    <Hero/>
-  )
-}
+    <>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Hero />} />
+          <Route path="/home" element={<Home />} />
+        </Routes>
+      </Router>
+    </>
+  );
+};
 
-export default App
+export default App;

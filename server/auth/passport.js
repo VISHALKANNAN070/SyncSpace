@@ -13,26 +13,23 @@ passport.use(new GitHubStrategy(
     },
     async (accessToken, refreshToken, profile, done) => { 
         try {
-            const email = profile.emails ?.[0]?.value;
+            const email = profile.emails?.[0]?.value;
             const name = profile.displayName || profile.username;
             if (!email) {
                 return done(new Error("No email found from Github"),null)
             }
             let user = await User.findOne({ email });
             if (!user) {
-                user = await new User.create({ name, email });
+                user = new User({ name, email });
                 await user.save();
+            } else if (user.name !== name) {
+                user.name = name;
+                await user.save()
             }
-            else {
-                if (user.name !== name) {
-                    user.name = name;
-                    await user.save()
-                }
-            }
-            return done(null, user);
+                return done(null, user);
         }
         catch (error) {
-        return done(err, null);
+        return done(error, null);
     }
     }
       

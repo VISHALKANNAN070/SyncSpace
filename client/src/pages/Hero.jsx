@@ -3,7 +3,7 @@ import logo from "../assets/images/SyncSpace_logo.png";
 
 const Hero = () => {
   const login = () => {
-    window.location.href = "/auth/github"; // Redirect to the GitHub OAuth endpoint
+    window.location.href = "http://localhost:5000/auth/github";
   }
   return (
     <>
@@ -16,14 +16,13 @@ const Hero = () => {
             A hub for your projects, notes and tasks, designed to make
             productivity simple, clear and fast.
           </p>
-          <a
-            href="#"
+          <button
             className="group flex flex-row items-center bg-black w-56 rounded-md p-3 justify-around transition-transform duration-300 hover:scale-105"
             onClick={login}
           >
             <p className="text-white text-2xl">Get Started</p>
             <FaArrowRight className="text-white size-6 transition-transform duration-300 group-hover:translate-x-2" />
-          </a>
+          </button>
         </div>
 
         <div className="hidden lg:block absolute top-0 right-0 h-full w-auto -z-10">

@@ -1,30 +1,33 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 const Home = () => {
-    const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res = await fetch("http://localhost:5000/profile", {
-                    credentials: "include"
-                })
-                if (!res.ok) {
-                    throw new Error("Failed to fetch user data");
-                }
-
-                const data = await res.json()
-                setUsername(data.username);
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/profile", {
+          credentials: "include",
+        });
+        if (!res.ok) {
+          navigate("/");
+          return;
         }
-            fetchUser();
-    },[])
-  return (
-    <div>
-      {`You successfully reached home page ${username}`}
-    </div>
-  );
-}
 
-export default Home
+        const data = await res.json();
+        setUsername(data.name);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        navigate("/");
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  return <div>You successfully reached home page {username}</div>;
+};
+
+export default Home;
