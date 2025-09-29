@@ -5,7 +5,7 @@ const Home = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await fetch("http:/localhost:5000/profile", {
+                const res = await fetch("http://localhost:5000/profile", {
                     credentials: "include"
                 })
                 if (!res.ok) {
