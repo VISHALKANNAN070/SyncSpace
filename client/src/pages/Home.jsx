@@ -8,7 +8,7 @@ const Home = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:5000/profile", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/profile`, {
           credentials: "include",
         });
         if (!res.ok) {
