@@ -13,7 +13,9 @@ dotenv.config();
 const app = express();
 
 app.use(cookieParser());
-app.use(cors({ origin: "http://localhost:5173",credentials: true }));
+app.use(
+  cors({ origin: `${process.env.FRONTEND_URL}`, credentials: true })
+);
 app.use(express.json());
 app.use(passport.initialize());
 
@@ -49,7 +51,7 @@ app.get("/auth/github/callback",
       maxAge: 24 * 60 * 60 * 1000 // 1 day
     })
 
-    res.redirect(`http://localhost:5173/home`);
+    res.redirect(`${process.env.FRONTEND_URL}/home`);
   })
 
 app.get("/profile", verifyToken, (req, res) => { res.json({ name: req.user.name }) })
