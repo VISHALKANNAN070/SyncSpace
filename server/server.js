@@ -3,9 +3,11 @@ import jwt from "jsonwebtoken";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import axios from "axios";
 import passport from "./auth/passport.js";
 import cookieParser from "cookie-parser";
 import verifyToken from "./middleware/auth.js";
+import Repo from "./models/repo.js";
 
 dotenv.config();
 const app = express();
@@ -17,16 +19,14 @@ app.use(passport.initialize());
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGODB_URL);
     console.log("MongoDB connected");
   } catch (err) {
     console.error("MongoDB connection error =>", err.message);
     process.exit(1);
   }
 };
+
 connectDB();
 
 app.get(
@@ -39,7 +39,12 @@ app.get(
   passport.authenticate("github", { session: false, failureRedirect: "/" }),
   (req, res) => {
     const token = jwt.sign(
-      { id: req.user.id, name: req.user.name, avatarURL: req.user.avatarURL },
+      {
+        id: req.user.id,
+        username: req.user.username,
+        name: req.user.name,
+        avatarURL: req.user.avatarURL,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -50,7 +55,7 @@ app.get(
       sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
-
+    fetchRepos(req.user);
     res.redirect(`${process.env.FRONTEND_URL}/home`);
   }
 );
@@ -65,7 +70,46 @@ app.post("/auth/logout", (req, res) => {
 });
 
 app.get("/profile", verifyToken, (req, res) => {
-  res.json({ name: req.user.name, avatarURL: req.user.avatarURL });
+  res.json({
+    username: req.user.username,
+    email: req.user.email,
+    name: req.user.name,
+    avatarURL: req.user.avatarURL,
+  });
+});
+
+export default async function fetchRepos(user) {
+  try {
+    const response = await axios.get(
+      `https://api.github.com/users/${user.username}/repos`
+    );
+
+    const repos = response.data.map((repo) => ({
+      user: user._id,
+      name: repo.name,
+    }));
+
+    for (let r of repos) {
+      await Repo.updateOne(
+        { user: r.user, name: r.name },
+        { $set: r },
+        { upsert: true }
+      );
+    }
+  } catch (error) {
+    console.error("Error fetching repos:", error);
+    return [];
+  }
+}
+
+app.get("/repos", verifyToken, async (req, res) => {
+  try {
+    const repos = await Repo.find({ user: req.user.id });
+    res.json(repos);
+  } catch (err) {
+    console.error("Error fetching repos from DB:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 app.get("/", (req, res) => {

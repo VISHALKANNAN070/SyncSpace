@@ -16,6 +16,7 @@ passport.use(
       try {
         const email = profile.emails?.[0]?.value;
         const name = profile.displayName || profile.username;
+        const username = profile.username;
         const avatar = profile.photos?.[0]?.value || null;
 
         if (!email) {
@@ -23,7 +24,7 @@ passport.use(
         }
         const user = await User.findOneAndUpdate(
           { email },
-          { name, avatarURL: avatar },
+          { username,name, avatarURL: avatar },
           { new: true, upsert: true }
         );
 

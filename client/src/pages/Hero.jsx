@@ -32,7 +32,7 @@ const Hero = () => {
           />
         </div>
       </div>
-      <footer className=" w-full py-4 px-4 flex items-center justify-center text-center border-t border-gray-700">
+      <footer className=" w-full py-4 px-4 flex items-center justify-center text-center border-t">
         <p className="text-xs sm:text-sm">
           Contact us via vishalkannan070@gmail.com or dhinaprogrammer7@gmail.com
         </p>
