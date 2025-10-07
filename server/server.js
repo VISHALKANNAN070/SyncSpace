@@ -1,12 +1,9 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import express from "express";
 import jwt from "jsonwebtoken";
 import cors from "cors";
 import mongoose from "mongoose";
+import "dotenv/config"
 import axios from "axios";
-import passport from "./auth/passport.js";
 import cookieParser from "cookie-parser";
 import verifyToken from "./middleware/auth.js";
 import Repo from "./models/repo.js";
@@ -16,6 +13,9 @@ const app = express();
 app.use(cookieParser());
 app.use(cors({ origin: `${process.env.FRONTEND_URL}`, credentials: true }));
 app.use(express.json());
+
+import passport from "passport";
+import "./auth/passport.js";
 app.use(passport.initialize());
 
 const connectDB = async () => {
