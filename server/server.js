@@ -1,7 +1,9 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import jwt from "jsonwebtoken";
 import cors from "cors";
-import dotenv from "dotenv";
 import mongoose from "mongoose";
 import axios from "axios";
 import passport from "./auth/passport.js";
@@ -9,7 +11,6 @@ import cookieParser from "cookie-parser";
 import verifyToken from "./middleware/auth.js";
 import Repo from "./models/repo.js";
 
-dotenv.config();
 const app = express();
 
 app.use(cookieParser());
