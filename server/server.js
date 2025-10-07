@@ -35,6 +35,8 @@ app.get(
   passport.authenticate("github", { scope: ["user:email"] })
 );
 
+const isProduction = process.env.NODE_ENV === "production";
+
 app.get(
   "/auth/github/callback",
   passport.authenticate("github", { session: false, failureRedirect: "/" }),
@@ -52,8 +54,8 @@ app.get(
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: isProduction, 
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
     fetchRepos(req.user);
@@ -64,8 +66,8 @@ app.get(
 app.post("/auth/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
+    secure: isProduction, 
+    sameSite: isProduction ? "none" : "lax",
   });
   res.status(200).json({ message: "Logged out successfully" });
 });
