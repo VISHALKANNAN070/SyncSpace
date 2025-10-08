@@ -2,7 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import cors from "cors";
 import mongoose from "mongoose";
-import "dotenv/config"
+import "dotenv/config";
 import axios from "axios";
 import cookieParser from "cookie-parser";
 import verifyToken from "./middleware/auth.js";
@@ -54,7 +54,7 @@ app.get(
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: isProduction, 
+      secure: isProduction,
       sameSite: isProduction ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
@@ -66,7 +66,7 @@ app.get(
 app.post("/auth/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: isProduction, 
+    secure: isProduction,
     sameSite: isProduction ? "none" : "lax",
   });
   res.status(200).json({ message: "Logged out successfully" });
@@ -114,6 +114,30 @@ app.get("/repos", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+app.post("/repos/select", verifyToken, async (req, res) => { 
+  const {selectedrepos} = req.body;
+  try {
+    await Repo.updateMany(
+      { _id: { $in: selectedrepos }, user: req.user.id },
+      {selected: true }
+    )
+    res.json({message: "Selected repos updated"})
+  } catch (err) { 
+    console.error("Error updating selected repos:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+})
+
+app.get("/repos/selected", verifyToken, async (req, res) => { 
+  try {
+    const selectedRepos = await Repo.find({ user: req.user.id, selected: true });
+    res.json(selectedRepos);
+  }catch (err) { 
+    console.error("Error fetching selected repos:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+})
 
 app.get("/", (req, res) => {
   res.send(`

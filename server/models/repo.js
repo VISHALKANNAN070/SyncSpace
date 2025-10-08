@@ -8,6 +8,10 @@ const repoSchema = new mongoose.Schema({
   name: {
     type: String,
   },
+  selected: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 const Repo = mongoose.model("Repo", repoSchema);
