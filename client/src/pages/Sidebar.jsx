@@ -98,7 +98,7 @@ const Sidebar = () => {
       </div>
 
       {/* Bottom User Menu Section */}
-      <div className=" relative" ref={menuRef}>
+      <div className=" relative">
         <div
           className="p-3 flex items-center gap-3 border-t border-gray-700 cursor-pointer hover:bg-gray-800 select-none"
           onClick={() => setMenuOpen(!menuOpen)}

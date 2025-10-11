@@ -63,7 +63,7 @@ app.get(
   }
 );
 
-app.post("/auth/logout", (req, res) => {
+app.get("/auth/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: isProduction,
