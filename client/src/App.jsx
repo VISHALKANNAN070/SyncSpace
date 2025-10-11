@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import Hero from "./pages/Hero";
 import Home from "./pages/Home";
-import Sidebar from "./pages/Sidebar";
+import Sidebar from "./Sidebar";
 import Suggestion from "./pages/Suggestion";
 
 const AppContent = () => {
