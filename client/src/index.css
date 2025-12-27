@@ -1,0 +1,35 @@
+/* Tailwind v4 entry */
+@import "tailwindcss";
+
+
+/* ===== Scrollbar base ===== */
+.scrollbar {
+  scrollbar-width: thin;               /* Firefox */
+  scrollbar-color: var(--sb-thumb) var(--sb-track);
+}
+
+/* WebKit browsers */
+.scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: var(--sb-track);
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--sb-thumb);
+  border-radius: 999px;
+}
+
+/* ===== Light mode ===== */
+.scrollbar-light {
+  --sb-track: #f3f4f6; /* gray-100 */
+  --sb-thumb: #d1d5db; /* gray-300 */
+}
+
+/* ===== Dark mode ===== */
+.scrollbar-dark {
+  --sb-track: #111827; /* gray-900 */
+  --sb-thumb: #374151; /* gray-700 */
+}
