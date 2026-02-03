@@ -33,8 +33,8 @@ router.get("/github/callback", (req, res, next) => {
     );
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
     });
     return res.redirect(process.env.FRONTEND_URL+"/auth/callback");
   })(req, res, next);
