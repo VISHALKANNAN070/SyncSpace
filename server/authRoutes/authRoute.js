@@ -3,7 +3,7 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 
 const router = express.Router();
-
+const isProd = process.env.NODE_ENV === "production"
 // GitHub OAuth login route
 router.get(
   "/github",
@@ -33,8 +33,8 @@ router.get("/github/callback", (req, res, next) => {
     );
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
     });
     return res.redirect(process.env.FRONTEND_URL+"/auth/callback");
   })(req, res, next);
@@ -44,8 +44,8 @@ router.get("/logout", (req, res) => {
   res.clearCookie("token", {
     path: "/",
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none":"lax",
   });
 
   res.redirect(process.env.FRONTEND_URL+"/auth/callback");
