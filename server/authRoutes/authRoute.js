@@ -35,6 +35,7 @@ router.get("/github/callback", (req, res, next) => {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? "none" : "lax",
+      path:"/",
     });
     return res.redirect(process.env.FRONTEND_URL+"/auth/callback");
   })(req, res, next);
