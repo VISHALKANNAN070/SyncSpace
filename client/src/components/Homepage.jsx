@@ -1,4 +1,12 @@
 const Homepage = ({ userData, darkMode }) => {
+  // SAFETY CHECK: If userData doesn't exist yet, return a loader or empty div
+  if (!userData) {
+    return <div className={`p-6 ${darkMode ? "text-white" : "text-gray-900"}`}>Loading...</div>;
+  }
+
+  // Helper to ensure we always have an array to work with
+  const repos = userData.repos || [];
+
   return (
     <div className="max-w-full">
       <div className="mb-8">
@@ -16,6 +24,7 @@ const Homepage = ({ userData, darkMode }) => {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-6 mb-8">
+        {/* Total Repositories */}
         <div
           className={`border rounded p-6 ${
             darkMode ? "border-gray-700" : "border-gray-200"
@@ -26,7 +35,8 @@ const Homepage = ({ userData, darkMode }) => {
               darkMode ? "text-white" : "text-gray-900"
             }`}
           >
-            {userData.repos.length}
+            {/* FIXED: Use the safe 'repos' variable */}
+            {repos.length}
           </div>
           <div
             className={`text-sm ${
@@ -36,6 +46,8 @@ const Homepage = ({ userData, darkMode }) => {
             Total Repositories
           </div>
         </div>
+
+        {/* Total Stars */}
         <div
           className={`border rounded p-6 ${
             darkMode ? "border-gray-700" : "border-gray-200"
@@ -46,7 +58,8 @@ const Homepage = ({ userData, darkMode }) => {
               darkMode ? "text-white" : "text-gray-900"
             }`}
           >
-            {userData.repos.reduce((acc, p) => acc + (p.stargazers_count || 0), 0)}
+            {/* FIXED: Safe reduce on empty array */}
+            {repos.reduce((acc, p) => acc + (p.stargazers_count || 0), 0)}
           </div>
           <div
             className={`text-sm ${
@@ -56,6 +69,8 @@ const Homepage = ({ userData, darkMode }) => {
             Total Stars
           </div>
         </div>
+
+        {/* Active This Week */}
         <div
           className={`border rounded p-6 ${
             darkMode ? "border-gray-700" : "border-gray-200"
@@ -66,9 +81,11 @@ const Homepage = ({ userData, darkMode }) => {
               darkMode ? "text-white" : "text-gray-900"
             }`}
           >
+            {/* FIXED: Safe filter on empty array */}
             {
-              userData.repos.filter(
+              repos.filter(
                 (p) => p.updated_at 
+                // Add your date logic here if needed, e.g., checking if it's within 7 days
               ).length
             }
           </div>
@@ -99,35 +116,42 @@ const Homepage = ({ userData, darkMode }) => {
                 : "border-gray-200 hover:border-gray-300"
             }`}
           >
-            {userData.repos?.map((repo, index) => (
-              <div
-                key={repo.id || index}
-                className={`border rounded p-4 transition-colors mb-3 ${
-                  darkMode
-                    ? "border-gray-700 hover:border-gray-600"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <h4
-                      className={`text-base mb-1 ${
-                        darkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {repo.name}
-                    </h4>
-                    <p
-                      className={`text-sm ${
-                        darkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {repo.description || "No Description"}
-                    </p>
+            {/* FIXED: Use safe 'repos' variable map */}
+            {repos.length > 0 ? (
+              repos.map((repo, index) => (
+                <div
+                  key={repo.id || index}
+                  className={`border rounded p-4 transition-colors mb-3 ${
+                    darkMode
+                      ? "border-gray-700 hover:border-gray-600"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h4
+                        className={`text-base mb-1 ${
+                          darkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {repo.name}
+                      </h4>
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {repo.description || "No Description"}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className={darkMode ? "text-gray-500" : "text-gray-400"}>
+                No projects found.
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -135,4 +159,4 @@ const Homepage = ({ userData, darkMode }) => {
   );
 };
 
-export default Homepage
+export default Homepage;
