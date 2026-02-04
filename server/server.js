@@ -19,6 +19,7 @@ const PORT = 5000;
 await import("./middleware/passport.js");
 
 //Middleware
+app.set("trust proxy", 1);
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
