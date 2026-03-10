@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { X, FolderGit2, Menu } from "lucide-react";
-
 import Login from "./components/Login";
 import Homepage from "./components/Homepage";
 import Sidebar from "./components/Sidebar";
@@ -13,7 +11,15 @@ const App = () => {
 
   // UI state
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+
+  //persistant dark/light mode
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem("darkMode");
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  //Selected Project
+  const [selectedProject, setSelectedProject] = useState(null);
 
   // OAuth login
   const handleGitHubLogin = () => {
@@ -39,8 +45,8 @@ const App = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          import.meta.env.VITE_BACKEND_URL + "/home",
-          { withCredentials: true }
+          import.meta.env.VITE_BACKEND_URL + "/home", //repos path
+          { withCredentials: true },
         );
 
         setUserData(res.data);
@@ -59,10 +65,19 @@ const App = () => {
       window.history.replaceState({}, "", "/");
     }
   }, []);
-  
+
+  useEffect(() => {
+    localStorage.setItem("darkMode",JSON.stringify(darkMode))
+  },[darkMode])
 
   if (!isLoggedIn) {
-    return <Login handleGitHubLogin={handleGitHubLogin} darkMode={darkMode} />;
+    return (
+      <Login
+        handleGitHubLogin={handleGitHubLogin}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
+    );
   }
 
   return (
@@ -73,21 +88,23 @@ const App = () => {
         open={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         onLogout={handleLogout}
-        onToggleDarkMode={() => setDarkMode(!darkMode)}
+        onToggleDarkMode={() => setDarkMode(prev=>!prev)}
+        onSelectProject={setSelectedProject}
       />
 
       <main
-        className={`min-h-screen transition-all duration-200
-    ${sidebarOpen ? "ml-64" : "ml-14"}
-  `}
+        className={`min-h-screen transition-all duration-200`}
       >
-        <div className="w-full px-6 py-8">
-          <Homepage userData={userData} darkMode={darkMode} />
-        </div>
+        {selectedProject ? (
+          <ProjectView project={selectedProject} />
+        ) : (
+          <div className="w-full px-6 py-8">
+            <Homepage userData={userData} darkMode={darkMode} />
+          </div>
+        )}
       </main>
     </div>
   );
-  
 };
 
 export default App;

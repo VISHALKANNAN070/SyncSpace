@@ -1,14 +1,33 @@
 const Homepage = ({ userData, darkMode }) => {
-  // SAFETY CHECK: If userData doesn't exist yet, return a loader or empty div
+  // Check for data
   if (!userData) {
-    return <div className={`p-6 ${darkMode ? "text-white" : "text-gray-900"}`}>Loading...</div>;
+    return (
+      <div className={`p-6 ${darkMode ? "text-white" : "text-gray-900"}`}>
+        Loading...
+      </div>
+    );
   }
 
-  // Helper to ensure we always have an array to work with
   const repos = userData.repos || [];
 
+  //Check for most used language
+  const languageCount = {};
+
+  repos.forEach((repo) => {
+    if (repo.language) {
+      languageCount[repo.language] = (languageCount[repo.language] || 0) + 1;
+    }
+  });
+
+  const mostUsedLanguage =
+    Object.keys(languageCount).length > 0
+      ? Object.keys(languageCount).reduce((a, b) =>
+          languageCount[a] > languageCount[b] ? a : b,
+        )
+      : "None";
+
   return (
-    <div className="max-w-full">
+    <div className="max-w-full ml-14">
       <div className="mb-8">
         <h2
           className={`text-2xl font-light mb-2 ${
@@ -23,7 +42,7 @@ const Homepage = ({ userData, darkMode }) => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
         {/* Total Repositories */}
         <div
           className={`border rounded p-6 ${
@@ -35,7 +54,6 @@ const Homepage = ({ userData, darkMode }) => {
               darkMode ? "text-white" : "text-gray-900"
             }`}
           >
-            {/* FIXED: Use the safe 'repos' variable */}
             {repos.length}
           </div>
           <div
@@ -58,7 +76,6 @@ const Homepage = ({ userData, darkMode }) => {
               darkMode ? "text-white" : "text-gray-900"
             }`}
           >
-            {/* FIXED: Safe reduce on empty array */}
             {repos.reduce((acc, p) => acc + (p.stargazers_count || 0), 0)}
           </div>
           <div
@@ -70,7 +87,7 @@ const Homepage = ({ userData, darkMode }) => {
           </div>
         </div>
 
-        {/* Active This Week */}
+        {/* Most Used Language */}
         <div
           className={`border rounded p-6 ${
             darkMode ? "border-gray-700" : "border-gray-200"
@@ -81,20 +98,14 @@ const Homepage = ({ userData, darkMode }) => {
               darkMode ? "text-white" : "text-gray-900"
             }`}
           >
-            {/* FIXED: Safe filter on empty array */}
-            {
-              repos.filter(
-                (p) => p.updated_at 
-                // Add your date logic here if needed, e.g., checking if it's within 7 days
-              ).length
-            }
+            {mostUsedLanguage}
           </div>
           <div
             className={`text-sm ${
               darkMode ? "text-gray-400" : "text-gray-600"
             }`}
           >
-            Active This Week
+            Most Used Language
           </div>
         </div>
       </div>
@@ -116,12 +127,11 @@ const Homepage = ({ userData, darkMode }) => {
                 : "border-gray-200 hover:border-gray-300"
             }`}
           >
-            {/* FIXED: Use safe 'repos' variable map */}
             {repos.length > 0 ? (
               repos.map((repo, index) => (
                 <div
                   key={repo.id || index}
-                  className={`border rounded p-4 transition-colors mb-3 ${
+                  className={`border-b p-2 transition-colors mb-3 ${
                     darkMode
                       ? "border-gray-700 hover:border-gray-600"
                       : "border-gray-200 hover:border-gray-300"

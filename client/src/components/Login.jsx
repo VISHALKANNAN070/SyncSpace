@@ -1,4 +1,4 @@
-import {Moon,FolderGit2,Github} from "lucide-react"
+import {Moon,Sun,FolderGit2,Github} from "lucide-react"
 const Login = ({ handleGitHubLogin, darkMode, setDarkMode }) => {
   return (
     <div
@@ -9,7 +9,7 @@ const Login = ({ handleGitHubLogin, darkMode, setDarkMode }) => {
       <div className="max-w-md w-full">
         <div className="absolute top-4 right-4">
           <button
-            onClick={() => setDarkMode(!darkMode)}
+            onClick={() => setDarkMode(prev=>!prev)}
             className={`p-2 rounded transition-colors ${
               darkMode
                 ? "hover:bg-gray-800 text-gray-400"

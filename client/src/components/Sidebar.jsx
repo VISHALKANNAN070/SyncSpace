@@ -16,6 +16,7 @@ const Sidebar = ({
   onToggle,
   onLogout,
   onToggleDarkMode,
+  onSelectProject,
 }) => {
   return (
     <aside
@@ -95,7 +96,7 @@ const Sidebar = ({
           />
         </nav>
 
-        {/* PROJECT LIST (RESPONSIVE) */}
+        {/* PROJECT LIST */}
         <div className="flex-1 min-h-0 px-2">
           <div
             className={`
@@ -112,6 +113,7 @@ const Sidebar = ({
             <div className="space-y-1">
               {userData?.repos?.map((repo) => (
                 <button
+                  onClick={()=>selectProject(project)}
                   key={repo.id}
                   className={`
                     w-full flex items-center px-2 py-2 rounded text-left text-sm
