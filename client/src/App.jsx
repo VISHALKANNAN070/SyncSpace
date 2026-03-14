@@ -3,6 +3,7 @@ import axios from "axios";
 import Login from "./components/Login";
 import Homepage from "./components/Homepage";
 import Sidebar from "./components/Sidebar";
+import ProjectView from "./components/ProjectView";
 
 const App = () => {
   // Core state
@@ -67,8 +68,8 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("darkMode",JSON.stringify(darkMode))
-  },[darkMode])
+    localStorage.setItem("darkMode", JSON.stringify(darkMode));
+  }, [darkMode]);
 
   if (!isLoggedIn) {
     return (
@@ -80,6 +81,9 @@ const App = () => {
     );
   }
 
+  const sidebarToggle = () => {
+    setSidebarOpen(false);
+  };
   return (
     <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-white"}`}>
       <Sidebar
@@ -88,15 +92,14 @@ const App = () => {
         open={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         onLogout={handleLogout}
-        onToggleDarkMode={() => setDarkMode(prev=>!prev)}
+        onToggleDarkMode={() => setDarkMode((prev) => !prev)}
         onSelectProject={setSelectedProject}
+        sidebarToggle={sidebarToggle}
       />
 
-      <main
-        className={`min-h-screen transition-all duration-200`}
-      >
+      <main className={`min-h-screen transition-all duration-200`}>
         {selectedProject ? (
-          <ProjectView project={selectedProject} />
+          <ProjectView darkMode={darkMode} project={selectedProject} />
         ) : (
           <div className="w-full px-6 py-8">
             <Homepage userData={userData} darkMode={darkMode} />
