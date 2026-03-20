@@ -15,10 +15,11 @@ router.get("/github/callback", (req, res, next) => {
   passport.authenticate("github", { session: false }, (err, user, info) => {
     if (err) {
       console.error(err);
-      return res.redirect("/");
+      // Redirect to frontend with error
+      return res.redirect(`${process.env.FRONTEND_URL}?error=auth_failed`);
     }
     if (!user) {
-      return res.redirect("/");
+      return res.redirect(`${process.env.FRONTEND_URL}?error=no_user`);
     }
 
     const token = jwt.sign(
@@ -34,11 +35,12 @@ router.get("/github/callback", (req, res, next) => {
     );
     res.cookie("token", token, {
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
+      secure: true,
+      sameSite: "none",
       path: "/",
     });
-    return res.redirect(process.env.FRONTEND_URL + "/auth/callback");
+    // Redirect to FRONTEND, not backend
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/callback`);
   })(req, res, next);
 });
 
