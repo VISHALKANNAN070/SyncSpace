@@ -8,7 +8,7 @@ passport.use(
     {
       clientID:process.env.GITHUB_CLIENT_ID ||console.log("id is undefined"),
   clientSecret:process.env.GITHUB_CLIENT_SECRET||console.log("secret is undefined"),
-  callbackURL:process.env.CALLBACKURL
+  callbackURL:process.env.CALLBACK_URL
 },
     async(accessToken,refreshToken,profile,done)=>{
      try{
