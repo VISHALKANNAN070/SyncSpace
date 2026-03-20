@@ -33,12 +33,13 @@ router.get("/github/callback", (req, res, next) => {
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
     );
-    res.cookie("token", token, {
+       res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: isProd,                      // true in prod, false locally
+      sameSite: isProd ? "none" : "lax",   // "none" in prod, "lax" locally
       path: "/",
     });
+
     // Redirect to FRONTEND, not backend
     return res.redirect(`${process.env.FRONTEND_URL}/auth/callback`);
   })(req, res, next);
