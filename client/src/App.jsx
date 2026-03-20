@@ -6,6 +6,15 @@ import Homepage from "./components/Homepage";
 import Sidebar from "./components/Sidebar";
 import ProjectView from "./components/ProjectView";
 
+// Interceptor to add authorization token if available
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 const App = () => {
   // Core state
   const [userData, setUserData] = useState(null);
@@ -39,11 +48,22 @@ const App = () => {
     } finally {
       setUserData(null);
       setIsLoggedIn(false);
+      localStorage.removeItem("token");
     }
   };
 
   // Fetch user data on login
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+    
+    if (window.location.pathname === "/auth/callback") {
+      window.history.replaceState({}, "", "/");
+    }
+
     const fetchData = async () => {
       try {
         const res = await axios.get(
@@ -60,12 +80,6 @@ const App = () => {
     };
 
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (window.location.pathname === "/auth/callback") {
-      window.history.replaceState({}, "", "/");
-    }
   }, []);
 
   useEffect(() => {

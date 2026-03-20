@@ -40,8 +40,8 @@ router.get("/github/callback", (req, res, next) => {
       path: "/",
     });
 
-    // Redirect to FRONTEND, not backend
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/callback`);
+    // Redirect to FRONTEND, passing the token
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}`);
   })(req, res, next);
 });
 
