@@ -5,11 +5,11 @@ import passport from "passport";
 import cookieParser from "cookie-parser";
 
 import connectDB from "./config/database.js";
-import loginRoutes from "./authRoutes/authRoute.js";
-import homeRoutes from "./homeRoutes/homeRoute.js";
+import loginRoute from "./authRoutes/authRoute.js";
+import homeRoute from "./userRoutes/homeRoute.js";
+import repoRoute from "./userRoutes/repoRoute.js";
+import noteRoute from "./userRoutes/noteRoute.js";
 
-// import dns from "dns"
-// dns.setServers(["8.8.8.8", "8.8.4.4"]);
 // Load env
 dotenv.config();
 
@@ -31,8 +31,10 @@ app.use(passport.initialize());
 connectDB();
 
 // Routes
-app.use("/auth", loginRoutes);
-app.use("/home", homeRoutes);
+app.use("/auth", loginRoute);
+app.use("/user-data", homeRoute);
+app.use("/api/repo", repoRoute);
+app.use("/api/note", noteRoute);
 
 // Health check
 app.get("/", (req, res) => {

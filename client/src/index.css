@@ -1,10 +1,9 @@
 /* Tailwind v4 entry */
 @import "tailwindcss";
 
-
 /* ===== Scrollbar base ===== */
 .scrollbar {
-  scrollbar-width: thin;               /* Firefox */
+  scrollbar-width: thin; /* Firefox */
   scrollbar-color: var(--sb-thumb) var(--sb-track);
 }
 

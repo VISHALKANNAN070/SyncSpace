@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   Menu,
   Pencil,
@@ -19,6 +20,22 @@ const Sidebar = ({
   onSelectProject,
   sidebarToggle,
 }) => {
+  const handleRepoClick = async (repo) => {
+    try {
+      await axios.post(
+        import.meta.env.VITE_BACKEND_URL + "/api/repo",
+        {
+          repoId: repo.id,
+          name: repo.name,
+          url: repo.html_url,
+        },
+        { withCredentials: true },
+      );
+      onSelectProject(repo);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
   return (
     <aside
       className={`
@@ -115,9 +132,7 @@ const Sidebar = ({
               {userData?.repos?.map((repo) => (
                 <button
                   onClick={() => {
-                    onSelectProject(
-                      userData.repos.find((r) => r.id === repo.id),
-                    );
+                    handleRepoClick(repo);
                     sidebarToggle();
                   }}
                   key={repo.id}

@@ -1,8 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const ProjectView = ({ project, darkMode }) => {
   const [copied, setCopied] = useState(false);
+  const [notes, setNotes] = useState([]);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const d = darkMode;
+
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const res = await axios.get(
+          import.meta.env.VITE_BACKEND_URL + `/api/note/${project.id}`,
+          { withCredentials: true },
+        );
+        setNotes(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchNotes();
+  }, [project]);
 
   const formatDate = (value) => {
     if (!value) return "N/A";

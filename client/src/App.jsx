@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
 import axios from "axios";
 import Login from "./components/Login";
 import Homepage from "./components/Homepage";
@@ -46,7 +47,7 @@ const App = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          import.meta.env.VITE_BACKEND_URL + "/home", //repos path
+          import.meta.env.VITE_BACKEND_URL + "/user-data", //repos path
           { withCredentials: true },
         );
 
@@ -98,13 +99,20 @@ const App = () => {
       />
 
       <main className={`min-h-screen transition-all duration-200`}>
-        {selectedProject ? (
-          <ProjectView darkMode={darkMode} project={selectedProject} />
-        ) : (
-          <div className="w-full px-6 py-8">
-            <Homepage userData={userData} darkMode={darkMode} />
-          </div>
-        )}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              selectedProject ? (
+                <ProjectView darkMode={darkMode} project={selectedProject} />
+              ) : (
+                <Homepage userData={userData} darkMode={darkMode} />
+              )
+            }
+          />
+
+          <Route path="*" element={<h1>404 - Not Found</h1>} />
+        </Routes>
       </main>
     </div>
   );

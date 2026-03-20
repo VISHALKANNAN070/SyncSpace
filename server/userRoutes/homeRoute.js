@@ -14,16 +14,14 @@ router.get("/", verifyToken, async (req, res) => {
     const userRes = await axios.get("https://api.github.com/user", {
       headers: { Authorization: `Bearer ${githubToken}` },
     });
-    
+
     const response = await axios.get("https://api.github.com/user/repos", {
       headers: {
         Authorization: `Bearer ${githubToken}`,
         Accept: "application/vnd.github+json",
       },
     });
-    return res
-      .status(200)
-      .json({ username, email, repos: response.data });
+    return res.status(200).json({ username, email, repos: response.data });
   } catch (err) {
     console.error(err);
     return res.json({ message: "Failed to fetch repos" });

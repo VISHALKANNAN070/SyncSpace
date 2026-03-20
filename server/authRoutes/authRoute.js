@@ -3,11 +3,11 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 
 const router = express.Router();
-const isProd = process.env.NODE_ENV === "production"
+const isProd = process.env.NODE_ENV === "production";
 // GitHub OAuth login route
 router.get(
   "/github",
-  passport.authenticate("github", { session: false, scope: ["user:email"] })
+  passport.authenticate("github", { session: false, scope: ["user:email"] }),
 );
 
 // GitHub OAuth callback route
@@ -23,21 +23,22 @@ router.get("/github/callback", (req, res, next) => {
 
     const token = jwt.sign(
       {
-        githubId: user._id,
+        _id: user._id,
+        githubId: user.githubId,
         username: user.username,
         email: user.email,
         accessToken: user.accessToken,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
     res.cookie("token", token, {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? "none" : "lax",
-      path:"/",
+      path: "/",
     });
-    return res.redirect(process.env.FRONTEND_URL+"/auth/callback");
+    return res.redirect(process.env.FRONTEND_URL + "/auth/callback");
   })(req, res, next);
 });
 
@@ -46,10 +47,10 @@ router.get("/logout", (req, res) => {
     path: "/",
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "none":"lax",
+    sameSite: isProd ? "none" : "lax",
   });
 
-  res.redirect(process.env.FRONTEND_URL+"/auth/callback");
+  res.redirect(process.env.FRONTEND_URL + "/auth/callback");
 });
 
 export default router;
