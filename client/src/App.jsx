@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Login from "./components/Login";
 import Homepage from "./components/Homepage";
@@ -16,6 +16,7 @@ axios.interceptors.request.use((config) => {
 });
 
 const App = () => {
+  const navigate = useNavigate();
   // Core state
   const [userData, setUserData] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -61,7 +62,7 @@ const App = () => {
     }
     
     if (window.location.pathname === "/auth/callback") {
-      window.history.replaceState({}, "", "/");
+      navigate("/",{replace : true})
     }
 
     const fetchData = async () => {
