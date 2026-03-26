@@ -130,7 +130,7 @@ const Homepage = ({ userData, darkMode, onSelectProject }) => {
             {repos.length > 0 ? (
               repos.map((repo, index) => (
                 <div
-                  onClick={()=>onSelectProject(repo)}
+                  onClick={() => onSelectProject(repo)}
                   key={repo.id || index}
                   className={`border-b p-2 transition-colors mb-3 cursor-pointer ${
                     darkMode

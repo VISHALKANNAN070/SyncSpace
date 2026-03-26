@@ -9,7 +9,7 @@ import loginRoute from "./authRoutes/authRoute.js";
 import homeRoute from "./userRoutes/homeRoute.js";
 import repoRoute from "./userRoutes/repoRoute.js";
 import noteRoute from "./userRoutes/noteRoute.js";
-import taskRoute from "./userRoutes/taskRoute.js"
+import taskRoute from "./userRoutes/taskRoute.js";
 
 // Load env
 dotenv.config();

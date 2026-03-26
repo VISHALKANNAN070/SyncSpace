@@ -72,8 +72,7 @@ const Sidebar = ({
               transition-opacity duration-150
               ${open ? "opacity-100" : "opacity-0"}
             `}
-          >
-          </div>
+          ></div>
 
           <div
             className={`
@@ -104,7 +103,10 @@ const Sidebar = ({
             label="Home"
             open={open}
             darkMode={darkMode}
-            onClick={() => navigate("/")}
+            onClick={() => {
+              sidebarToggle();
+              navigate("/");
+            }}
           />
 
           <SidebarItem

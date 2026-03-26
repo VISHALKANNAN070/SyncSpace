@@ -19,20 +19,20 @@ router.post("/:repoId", verifyToken, async (req, res) => {
 router.get("/:repoId", verifyToken, async (req, res) => {
   const todos = await Task.find({
     userId: req.user._id,
-    repoId: req.params.repoId
-  })
-  res.json(todos)
+    repoId: req.params.repoId,
+  });
+  res.json(todos);
 });
 
 router.patch("/:id", verifyToken, async (req, res) => {
-  const todo = await Task.findById(req.params.id)
-  todo.completed = !todo.completed
+  const todo = await Task.findById(req.params.id);
+  todo.completed = !todo.completed;
   await todo.save();
-  res.json(todo)
+  res.json(todo);
 });
 router.delete("/:id", verifyToken, async (req, res) => {
-  await Task.findByIdAndDelete(req.params.id)
-  res.json({message:"Deleted"})
+  await Task.findByIdAndDelete(req.params.id);
+  res.json({ message: "Deleted" });
 });
 
-export default router
+export default router;

@@ -1,13 +1,13 @@
 import express from "express";
 import axios from "axios";
 import verifyToken from "../middleware/verifyToken.js";
-import User from "../models/user.model.js"
+import User from "../models/user.model.js";
 const router = express.Router();
 
 // Protected route to get user info and GitHub repos
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id)
+    const user = await User.findById(req.user._id);
     const username = user.username;
     const email = user.email;
     const githubToken = user.accessToken;

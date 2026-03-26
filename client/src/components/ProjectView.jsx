@@ -204,7 +204,10 @@ const ProjectView = ({ userData, darkMode }) => {
               Open repository
             </a>
 
-            <button onClick={handleCopy} className={buttonCls}>
+            <button
+              onClick={handleCopy}
+              className={`cursor-pointer ${buttonCls}`}
+            >
               {copied ? "Copied" : "Copy clone URL"}
             </button>
           </div>
@@ -239,7 +242,10 @@ const ProjectView = ({ userData, darkMode }) => {
                 placeholder="Add task..."
                 className={`flex-1 p-2 text-sm border ${borderCls} ${panelCls} ${textCls}`}
               />
-              <button onClick={handleAddtask} className={buttonCls}>
+              <button
+                onClick={handleAddtask}
+                className={`cursor-pointer ${buttonCls}`}
+              >
                 Add
               </button>
             </div>
@@ -266,7 +272,7 @@ const ProjectView = ({ userData, darkMode }) => {
                         handleDeletetask(task._id);
                       }
                     }}
-                    className="text-red-500 text-xs"
+                    className="text-red-500 text-xs cursor-pointer"
                   >
                     Delete
                   </button>
@@ -283,7 +289,7 @@ const ProjectView = ({ userData, darkMode }) => {
             {!showNoteInput && (
               <button
                 onClick={() => setShowNoteInput(true)}
-                className={buttonCls}
+                className={`cursor-pointer ${buttonCls}`}
               >
                 Add Note
               </button>
@@ -308,13 +314,16 @@ const ProjectView = ({ userData, darkMode }) => {
                 />
 
                 <div className="flex gap-2">
-                  <button onClick={handleAddNote} className={buttonCls}>
+                  <button
+                    onClick={handleAddNote}
+                    className={`cursor-pointer ${buttonCls}`}
+                  >
                     Save
                   </button>
 
                   <button
                     onClick={() => setShowNoteInput(false)}
-                    className={`border border-red-500 ${buttonCls}`}
+                    className={`border border-red-500 cursor-pointer ${buttonCls}`}
                   >
                     Cancel
                   </button>
@@ -340,7 +349,7 @@ const ProjectView = ({ userData, darkMode }) => {
                         handleDeleteNote(note._id);
                       }
                     }}
-                    className=" text-red-500 text-xs"
+                    className=" text-red-500 text-xs cursor-pointer"
                   >
                     Delete
                   </button>
