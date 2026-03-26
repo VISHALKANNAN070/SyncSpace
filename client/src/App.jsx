@@ -45,7 +45,6 @@ const App = () => {
   useEffect(() => {
     if (window.location.pathname === "/auth/callback") {
       navigate("/", { replace: true });
-      return;
     }
 
     const fetchData = async () => {
