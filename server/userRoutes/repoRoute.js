@@ -10,7 +10,6 @@ router.post("/", verifyToken, async (req, res) => {
   try {
     const { repoId, name, url } = req.body;
     const userId = req.user._id;
-    console.log(typeof req.user._id, req.user._id);
     let repo = await Repo.findOne({ userId, repoId });
 
     if (!repo) {

@@ -8,11 +8,11 @@ const taskSchema = mongoose.Schema(
       required: true,
     },
     repoId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: "Repo",
       required: true,
     },
-    title: {
+    text: {
       type: String,
       required: true,
     },

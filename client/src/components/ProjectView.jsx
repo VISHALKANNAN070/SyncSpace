@@ -1,18 +1,30 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 
-const ProjectView = ({ project, darkMode }) => {
+const ProjectView = ({ userData, darkMode }) => {
+  const { id } = useParams();
+  const [project, setProject] = useState(null);
   const [copied, setCopied] = useState(false);
   const [notes, setNotes] = useState([]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [noteTitle, setNoteTitle] = useState("");
+  const [noteContent, setNoteContent] = useState("");
+  const [showNoteInput, setShowNoteInput] = useState(false);
+  const [tasks, setTasks] = useState([]);
+  const [taskText, setTaskText] = useState("");
   const d = darkMode;
+
+  useEffect(() => {
+    if (!userData) return;
+    const found = userData.repos.find((p) => String(p.id) === id);
+    setProject(found);
+  }, [id, userData]);
 
   useEffect(() => {
     const fetchNotes = async () => {
       try {
         const res = await axios.get(
-          import.meta.env.VITE_BACKEND_URL + `/api/note/${project.id}`,
+          import.meta.env.VITE_BACKEND_URL + `/api/note/${id}`,
           { withCredentials: true },
         );
         setNotes(res.data);
@@ -21,7 +33,23 @@ const ProjectView = ({ project, darkMode }) => {
       }
     };
     fetchNotes();
-  }, [project]);
+  }, [id]);
+
+  useEffect(() => {
+    const fetchtasks = async () => {
+      try {
+        const res = await axios.get(
+          import.meta.env.VITE_BACKEND_URL + `/api/task/${id}`,
+          { withCredentials: true },
+        );
+        setTasks(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchtasks();
+  }, [id]);
 
   const formatDate = (value) => {
     if (!value) return "N/A";
@@ -34,14 +62,89 @@ const ProjectView = ({ project, darkMode }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleAddNote = async () => {
+    try {
+      const res = await axios.post(
+        import.meta.env.VITE_BACKEND_URL + `/api/note/${id}`,
+        {
+          title: noteTitle,
+          content: noteContent,
+        },
+        { withCredentials: true },
+      );
+
+      setNotes((prev) => [...prev, res.data]);
+      setNoteTitle("");
+      setNoteContent("");
+      setShowNoteInput(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    try {
+      await axios.delete(
+        import.meta.env.VITE_BACKEND_URL + `/api/note/${noteId}`,
+        { withCredentials: true },
+      );
+
+      setNotes((prev) => prev.filter((n) => n._id !== noteId));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAddtask = async () => {
+    if (!taskText.trim()) return;
+
+    try {
+      const res = await axios.post(
+        import.meta.env.VITE_BACKEND_URL + `/api/task/${id}`,
+        { text: taskText },
+        { withCredentials: true },
+      );
+
+      setTasks((prev) => [...prev, res.data]);
+      setTaskText("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleToggletask = async (taskId) => {
+    try {
+      const res = await axios.patch(
+        import.meta.env.VITE_BACKEND_URL + `/api/task/${taskId}`,
+        {},
+        { withCredentials: true },
+      );
+
+      setTasks((prev) => prev.map((t) => (t._id === taskId ? res.data : t)));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeletetask = async (taskId) => {
+    try {
+      await axios.delete(
+        import.meta.env.VITE_BACKEND_URL + `/api/task/${taskId}`,
+        { withCredentials: true },
+      );
+
+      setTasks((prev) => prev.filter((t) => t._id !== taskId));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  if (!userData) {
+    return <div>Loading user data...</div>;
+  }
+
   if (!project) {
-    return (
-      <div
-        className={`ml-16 px-8 py-8 text-sm ${d ? "text-gray-500" : "text-gray-400"}`}
-      >
-        Loading...
-      </div>
-    );
+    return <div>Project not found</div>;
   }
 
   const textCls = d ? "text-white" : "text-gray-900";
@@ -50,12 +153,8 @@ const ProjectView = ({ project, darkMode }) => {
   const panelCls = d ? "bg-[#111827]" : "bg-white";
 
   const buttonCls = d
-    ? "border border-gray-600 px-4 py-2 text-sm text-white hover:border-gray-400"
-    : "border border-gray-300 px-4 py-2 text-sm text-gray-900 hover:border-gray-500";
-
-  const toggleCls = d
-    ? "border border-gray-600 px-3 py-2 text-sm text-white hover:border-gray-400"
-    : "border border-gray-300 px-3 py-2 text-sm text-gray-900 hover:border-gray-500";
+    ? "border border-gray-600 px-4 py-2 text-sm text-white hover:border-gray-400 w-37"
+    : "border border-gray-300 px-4 py-2 text-sm text-gray-900 hover:border-gray-500 w-37";
 
   const details = [
     { label: "Owner", value: project.owner?.login || "Unknown" },
@@ -69,14 +168,12 @@ const ProjectView = ({ project, darkMode }) => {
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <header className="mb-10 flex items-start justify-between">
-          <div>
+          <div className="flex flex-col gap-4">
             <p className={`text-sm ${mutedCls}`}>
               https://github.com/{project.owner?.login ?? "unknown"}/
             </p>
 
-            <h1 className={`mt-1 text-3xl font-semibold ${textCls}`}>
-              {project.name}
-            </h1>
+            <h1 className={`mt-1 text-3xl ${textCls}`}>{project.name}</h1>
 
             <p className={`mt-2 max-w-3xl ${mutedCls}`}>
               {project.description || "No description provided"}
@@ -130,22 +227,49 @@ const ProjectView = ({ project, darkMode }) => {
               ))}
             </div>
           </div>
-
-          {/* Todo */}
+          {/* Task */}
           <div className={`border p-6 ${borderCls} ${panelCls}`}>
-            <h2 className={`text-lg font-medium mb-4 ${textCls}`}>Todo</h2>
+            <h2 className={`text-lg font-medium mb-4 ${textCls}`}>Tasks</h2>
 
-            <div className="space-y-3">
-              {[
-                "Plan next feature",
-                "Fix open bugs",
-                "Improve documentation",
-              ].map((item) => (
+            {/* Input */}
+            <div className="flex gap-2 mb-4">
+              <input
+                value={taskText}
+                onChange={(e) => setTaskText(e.target.value)}
+                placeholder="Add task..."
+                className={`flex-1 p-2 text-sm border ${borderCls} ${panelCls} ${textCls}`}
+              />
+              <button onClick={handleAddtask} className={buttonCls}>
+                Add
+              </button>
+            </div>
+
+            {/* List */}
+            <div className="space-y-2">
+              {tasks.map((task) => (
                 <div
-                  key={item}
-                  className={`border px-3 py-2 text-sm ${borderCls} ${textCls}`}
+                  key={task._id}
+                  className={`flex justify-between items-center border px-3 py-2 text-sm ${borderCls} ${textCls}`}
                 >
-                  {item}
+                  <span
+                    onClick={() => handleToggletask(task._id)}
+                    className={`cursor-pointer ${
+                      task.completed ? "line-through opacity-60" : ""
+                    }`}
+                  >
+                    {task.text}
+                  </span>
+
+                  <button
+                    onClick={() => {
+                      if (window.confirm("Delete this task?")) {
+                        handleDeletetask(task._id);
+                      }
+                    }}
+                    className="text-red-500 text-xs"
+                  >
+                    Delete
+                  </button>
                 </div>
               ))}
             </div>
@@ -155,10 +279,74 @@ const ProjectView = ({ project, darkMode }) => {
           <div className={`border p-6 lg:col-span-2 ${borderCls} ${panelCls}`}>
             <h2 className={`text-lg font-medium mb-4 ${textCls}`}>Notes</h2>
 
-            <p className={`text-sm leading-6 ${mutedCls}`}>
-              Keep architecture ideas, quick reminders, and planning notes
-              related to this repository.
-            </p>
+            {/* Toggle Button */}
+            {!showNoteInput && (
+              <button
+                onClick={() => setShowNoteInput(true)}
+                className={buttonCls}
+              >
+                Add Note
+              </button>
+            )}
+
+            {/* Input Section */}
+            {showNoteInput && (
+              <div className="mb-4 space-y-2">
+                <input
+                  type="text"
+                  placeholder="Title"
+                  value={noteTitle}
+                  onChange={(e) => setNoteTitle(e.target.value)}
+                  className={`w-full p-2 text-sm border ${borderCls} ${panelCls} ${textCls}`}
+                />
+
+                <textarea
+                  placeholder="Content"
+                  value={noteContent}
+                  onChange={(e) => setNoteContent(e.target.value)}
+                  className={`w-full p-2 text-sm border ${borderCls} ${panelCls} ${textCls}`}
+                />
+
+                <div className="flex gap-2">
+                  <button onClick={handleAddNote} className={buttonCls}>
+                    Save
+                  </button>
+
+                  <button
+                    onClick={() => setShowNoteInput(false)}
+                    className={`border border-red-500 ${buttonCls}`}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Notes List */}
+            <div className="space-y-3 mt-3">
+              {notes.map((note) => (
+                <div
+                  key={note._id}
+                  className={`border p-3 text-sm flex justify-between ${borderCls} ${textCls}`}
+                >
+                  <div>
+                    <h4 className="font-medium">{note.title}</h4>
+                    <p className={mutedCls}>{note.content}</p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      if (window.confirm("Delete this note?")) {
+                        handleDeleteNote(note._id);
+                      }
+                    }}
+                    className=" text-red-500 text-xs"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </div>

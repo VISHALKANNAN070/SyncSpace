@@ -23,7 +23,6 @@ router.get("/:repoId", verifyToken, async (req, res) => {
   try {
     const { repoId } = req.params;
     const userId = req.user._id;
-    console.log(typeof req.user._id, req.user._id);
     const note = await Note.find({ userId, repoId: String(repoId) });
     res.status(200).json(note);
   } catch (err) {

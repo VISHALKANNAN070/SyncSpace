@@ -9,6 +9,7 @@ import loginRoute from "./authRoutes/authRoute.js";
 import homeRoute from "./userRoutes/homeRoute.js";
 import repoRoute from "./userRoutes/repoRoute.js";
 import noteRoute from "./userRoutes/noteRoute.js";
+import taskRoute from "./userRoutes/taskRoute.js"
 
 // Load env
 dotenv.config();
@@ -35,6 +36,7 @@ app.use("/auth", loginRoute);
 app.use("/user-data", homeRoute);
 app.use("/api/repo", repoRoute);
 app.use("/api/note", noteRoute);
+app.use("/api/task", taskRoute);
 
 // Health check
 app.get("/", (req, res) => {

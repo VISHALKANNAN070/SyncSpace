@@ -1,4 +1,4 @@
-const Homepage = ({ userData, darkMode }) => {
+const Homepage = ({ userData, darkMode, onSelectProject }) => {
   // Check for data
   if (!userData) {
     return (
@@ -27,7 +27,7 @@ const Homepage = ({ userData, darkMode }) => {
       : "None";
 
   return (
-    <div className="max-w-full ml-14">
+    <div className="max-w-full ml-14 md:p-8 sm:p-0">
       <div className="mb-8">
         <h2
           className={`text-2xl font-light mb-2 ${
@@ -130,8 +130,9 @@ const Homepage = ({ userData, darkMode }) => {
             {repos.length > 0 ? (
               repos.map((repo, index) => (
                 <div
+                  onClick={()=>onSelectProject(repo)}
                   key={repo.id || index}
-                  className={`border-b p-2 transition-colors mb-3 ${
+                  className={`border-b p-2 transition-colors mb-3 cursor-pointer ${
                     darkMode
                       ? "border-gray-700 hover:border-gray-600"
                       : "border-gray-200 hover:border-gray-300"

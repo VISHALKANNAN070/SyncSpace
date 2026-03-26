@@ -1,15 +1,16 @@
 import express from "express";
 import axios from "axios";
 import verifyToken from "../middleware/verifyToken.js";
-
+import User from "../models/user.model.js"
 const router = express.Router();
 
 // Protected route to get user info and GitHub repos
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const username = req.user.username;
-    const email = req.user.email;
-    const githubToken = req.user.accessToken;
+    const user = await User.findById(req.user._id)
+    const username = user.username;
+    const email = user.email;
+    const githubToken = user.accessToken;
 
     const userRes = await axios.get("https://api.github.com/user", {
       headers: { Authorization: `Bearer ${githubToken}` },

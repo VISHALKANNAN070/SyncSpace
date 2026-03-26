@@ -1,3 +1,4 @@
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Menu,
@@ -20,7 +21,11 @@ const Sidebar = ({
   onSelectProject,
   sidebarToggle,
 }) => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const handleRepoClick = async (repo) => {
+    onSelectProject(repo);
     try {
       await axios.post(
         import.meta.env.VITE_BACKEND_URL + "/api/repo",
@@ -36,6 +41,7 @@ const Sidebar = ({
       console.error(err.message);
     }
   };
+
   return (
     <aside
       className={`
@@ -67,7 +73,6 @@ const Sidebar = ({
               ${open ? "opacity-100" : "opacity-0"}
             `}
           >
-            <span className="text-sm font-medium text-gray-400">Projects</span>
           </div>
 
           <div
@@ -94,6 +99,14 @@ const Sidebar = ({
 
         {/* NAV */}
         <nav className="mt-3 flex flex-col gap-1 px-2 shrink-0">
+          <SidebarItem
+            icon={Folder}
+            label="Home"
+            open={open}
+            darkMode={darkMode}
+            onClick={() => navigate("/")}
+          />
+
           <SidebarItem
             icon={Pencil}
             label="New Project"
@@ -139,9 +152,11 @@ const Sidebar = ({
                   className={`
                     w-full flex items-center px-2 py-2 rounded text-left text-sm
                     ${
-                      darkMode
-                        ? "text-gray-200 hover:bg-gray-800"
-                        : "text-gray-800 hover:bg-gray-100"
+                      String(repo.id) === id
+                        ? "bg-gray-300 text-black dark:bg-gray-700 dark:text-white"
+                        : darkMode
+                          ? "text-gray-200 hover:bg-gray-800"
+                          : "text-gray-800 hover:bg-gray-100"
                     }
                   `}
                 >
@@ -210,9 +225,10 @@ const Sidebar = ({
   );
 };
 
-const SidebarItem = ({ icon: Icon, label, open, darkMode }) => {
+const SidebarItem = ({ icon: Icon, label, open, darkMode, onClick }) => {
   return (
     <button
+      onClick={onClick}
       className={`
         flex items-center p-2 rounded
         ${darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"}

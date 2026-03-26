@@ -22,26 +22,18 @@ router.get("/github/callback", (req, res, next) => {
       return res.redirect(`${process.env.FRONTEND_URL}?error=no_user`);
     }
 
-    const token = jwt.sign(
-      {
-        _id: user._id,
-        githubId: user.githubId,
-        username: user.username,
-        email: user.email,
-        accessToken: user.accessToken,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" },
-    );
-       res.cookie("token", token, {
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    res.cookie("token", token, {
       httpOnly: true,
-      secure: isProd,                      // true in prod, false locally
-      sameSite: isProd ? "none" : "lax",   // "none" in prod, "lax" locally
+      secure: isProd, // true in prod, false locally
+      sameSite: isProd ? "none" : "lax", // "none" in prod, "lax" locally
       path: "/",
     });
 
     // Redirect to FRONTEND, passing the token
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}`);
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/callback`);
   })(req, res, next);
 });
 
@@ -51,9 +43,10 @@ router.get("/logout", (req, res) => {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? "none" : "lax",
+    maxAge: 24 * 60 * 60 * 1000,
   });
 
-  res.redirect(process.env.FRONTEND_URL + "/auth/callback");
+  res.status(200).json({ message: "Logout successful" });
 });
 
 export default router;
