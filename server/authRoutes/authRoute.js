@@ -33,8 +33,30 @@ router.get("/github/callback", (req, res, next) => {
     });
 
     // Redirect to FRONTEND, passing the token
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/callback`);
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/auth/callback?token=${token}`,
+    );
   })(req, res, next);
+});
+
+router.post("/set-cookie", (req, res) => {
+  const { token } = req.body;
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+  } catch {
+    return res.status(401).json({ error: "Invalid token" });
+  }
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
+    path: "/",
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
+  res.status(200).json({ message: "OK" });
 });
 
 router.get("/logout", (req, res) => {

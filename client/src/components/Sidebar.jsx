@@ -105,7 +105,7 @@ const Sidebar = ({
             darkMode={darkMode}
             onClick={() => {
               sidebarToggle();
-              navigate("/");
+              navigate("/home");
             }}
           />
 

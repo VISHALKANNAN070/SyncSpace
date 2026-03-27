@@ -5,6 +5,7 @@ import Login from "./components/Login";
 import Homepage from "./components/Homepage";
 import Sidebar from "./components/Sidebar";
 import ProjectView from "./components/ProjectView";
+import AuthCallback from "./components/AuthCallback";
 
 const App = () => {
   const navigate = useNavigate();
@@ -41,29 +42,29 @@ const App = () => {
     }
   };
 
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        import.meta.env.VITE_BACKEND_URL + "/user-data", //repos path
+        { withCredentials: true },
+      );
+
+      setUserData(res.data);
+      setIsLoggedIn(true);
+    } catch (err) {
+      console.error(err);
+      setIsLoggedIn(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   // Fetch user data on login
   useEffect(() => {
     if (window.location.pathname === "/auth/callback") {
-      navigate("/", { replace: true });
+      setLoading(false);
+      return;
     }
-
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(
-          import.meta.env.VITE_BACKEND_URL + "/user-data", //repos path
-          { withCredentials: true },
-        );
-
-        setUserData(res.data);
-        setIsLoggedIn(true);
-      } catch (err) {
-        console.error(err);
-        setIsLoggedIn(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
@@ -72,7 +73,25 @@ const App = () => {
   }, [darkMode]);
 
   if (loading) {
-    return <div className="p-6">Loading...</div>;
+     return (
+       <div className={`min-h-screen flex flex-col items-center justify-center gap-3 ${darkMode ? "bg-gray-900" : "bg-white"}`}>
+         <div className="w-6 h-6 rounded-full border-2 border-gray-300 border-t-gray-600 animate-spin" />
+         <p className={`text-sm tracking-wide ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+           Loading...
+         </p>
+       </div>
+     );
+   }
+
+  if (window.location.pathname === "/auth/callback") {
+    return (
+      <Routes>
+        <Route
+          path="/auth/callback"
+          element={<AuthCallback fetchData={fetchData} />}
+        />
+      </Routes>
+    );
   }
 
   if (!isLoggedIn) {
@@ -106,7 +125,7 @@ const App = () => {
       <main className={`min-h-screen transition-all duration-200`}>
         <Routes>
           <Route
-            path="/"
+            path="/home"
             element={
               <Homepage
                 userData={userData}
