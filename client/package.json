@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "varlock run -- vite",
+    "build": "varlock run -- vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "varlock run -- vite preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
@@ -16,7 +16,8 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "varlock": "^0.7.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
