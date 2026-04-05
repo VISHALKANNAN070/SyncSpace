@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const ProjectView = ({ userData, darkMode }) => {
   const { id } = useParams();
-  const [project, setProject] = useState(null);
+
   const [copied, setCopied] = useState(false);
   const [notes, setNotes] = useState([]);
   const [noteTitle, setNoteTitle] = useState("");
@@ -14,11 +14,10 @@ const ProjectView = ({ userData, darkMode }) => {
   const [taskText, setTaskText] = useState("");
   const d = darkMode;
 
-  useEffect(() => {
-    if (!userData) return;
-    const found = userData.repos.find((p) => String(p.id) === id);
-    setProject(found);
-  }, [id, userData]);
+  const project = useMemo(
+    () => userData?.repos?.find((p) => String(p.id) === id) ?? null,
+    [id, userData],
+  );
 
   useEffect(() => {
     const fetchNotes = async () => {
@@ -153,8 +152,8 @@ const ProjectView = ({ userData, darkMode }) => {
   const panelCls = d ? "bg-[#111827]" : "bg-white";
 
   const buttonCls = d
-    ? "border border-gray-600 px-4 py-2 text-sm text-white hover:border-gray-400 w-37"
-    : "border border-gray-300 px-4 py-2 text-sm text-gray-900 hover:border-gray-500 w-37";
+    ? "border border-gray-600 px-4 py-2 text-sm text-white hover:border-gray-400"
+    : "border border-gray-300 px-4 py-2 text-sm text-gray-900 hover:border-gray-500";
 
   const details = [
     { label: "Owner", value: project.owner?.login || "Unknown" },

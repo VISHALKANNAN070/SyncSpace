@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import axios from "axios";
 import Login from "./components/Login";
 import Homepage from "./components/Homepage";
@@ -9,6 +15,8 @@ import AuthCallback from "./components/AuthCallback";
 
 const App = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   // Core state
   const [userData, setUserData] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -17,7 +25,7 @@ const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  //persistant dark/light mode
+  // Persistent dark/light mode
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem("darkMode");
     return saved ? JSON.parse(saved) : false;
@@ -42,71 +50,80 @@ const App = () => {
     }
   };
 
+  // Returns true on success, false on failure
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        import.meta.env.VITE_BACKEND_URL + "/user-data", //repos path
+        import.meta.env.VITE_BACKEND_URL + "/user-data",
         { withCredentials: true },
       );
-
       setUserData(res.data);
       setIsLoggedIn(true);
+      return true;
     } catch (err) {
       console.error(err);
       setIsLoggedIn(false);
+      return false;
     } finally {
       setLoading(false);
     }
   };
-  
-  // Fetch user data on login
+
+  // Skip fetchData on auth callback — AuthCallback handles it
   useEffect(() => {
-    if (window.location.pathname === "/auth/callback") {
+    if (location.pathname === "/auth/callback") {
       setLoading(false);
       return;
     }
     fetchData();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
 
-  if (loading) {
-     return (
-       <div className={`min-h-screen flex flex-col items-center justify-center gap-3 ${darkMode ? "bg-gray-900" : "bg-white"}`}>
-         <div className="w-6 h-6 rounded-full border-2 border-gray-300 border-t-gray-600 animate-spin" />
-         <p className={`text-sm tracking-wide ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
-           Loading...
-         </p>
-       </div>
-     );
-   }
+  const loadingScreen = (
+    <div
+      className={`min-h-screen flex flex-col items-center justify-center gap-3 ${
+        darkMode ? "bg-gray-900" : "bg-white"
+      }`}
+    >
+      <div className="w-6 h-6 rounded-full border-2 border-gray-300 border-t-gray-600 animate-spin" />
+      <p
+        className={`text-sm tracking-wide ${
+          darkMode ? "text-gray-400" : "text-gray-500"
+        }`}
+      >
+        Loading...
+      </p>
+    </div>
+  );
 
-  if (window.location.pathname === "/auth/callback") {
+  if (loading) return loadingScreen;
+
+  // Not logged in: expose auth callback + login
+  if (!isLoggedIn) {
     return (
       <Routes>
         <Route
           path="/auth/callback"
-          element={<AuthCallback fetchData={fetchData} />}
+          element={<AuthCallback fetchData={fetchData} darkMode={darkMode} />}
+        />
+        <Route
+          path="*"
+          element={
+            <Login
+              handleGitHubLogin={handleGitHubLogin}
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+            />
+          }
         />
       </Routes>
     );
   }
 
-  if (!isLoggedIn) {
-    return (
-      <Login
-        handleGitHubLogin={handleGitHubLogin}
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-      />
-    );
-  }
-
-  const sidebarToggle = () => {
-    setSidebarOpen(false);
-  };
+  // Logged in: full app layout
   return (
     <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-white"}`}>
       <Sidebar
@@ -119,11 +136,12 @@ const App = () => {
         onSelectProject={(project) => {
           navigate(`/project/${project.id}`);
         }}
-        sidebarToggle={sidebarToggle}
+        sidebarToggle={() => setSidebarOpen(false)}
       />
 
-      <main className={`min-h-screen transition-all duration-200`}>
+      <main className="min-h-screen transition-all duration-200">
         <Routes>
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route
             path="/home"
             element={

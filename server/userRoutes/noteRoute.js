@@ -1,11 +1,10 @@
 import express from "express";
-import axios from "axios";
 import verifyToken from "../middleware/verifyToken.js";
 import Note from "../models/note.model.js";
 
 const router = express.Router();
 
-//create note for a repo
+// Create note for a repo
 router.post("/:repoId", verifyToken, async (req, res) => {
   try {
     const { repoId } = req.params;
@@ -18,20 +17,20 @@ router.post("/:repoId", verifyToken, async (req, res) => {
   }
 });
 
-//get notes for a repo
+// Get notes for a repo
 router.get("/:repoId", verifyToken, async (req, res) => {
   try {
     const { repoId } = req.params;
     const userId = req.user._id;
-    const note = await Note.find({ userId, repoId: String(repoId) });
-    res.status(200).json(note);
+    const notes = await Note.find({ userId, repoId: String(repoId) });
+    res.status(200).json(notes);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-//delete note
+// Delete note
 router.delete("/:_id", verifyToken, async (req, res) => {
   try {
     const { _id } = req.params;

@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 const isProd = process.env.NODE_ENV === "production";
+
 // GitHub OAuth login route
 router.get(
   "/github",
@@ -15,7 +16,6 @@ router.get("/github/callback", (req, res, next) => {
   passport.authenticate("github", { session: false }, (err, user, info) => {
     if (err) {
       console.error(err);
-      // Redirect to frontend with error
       return res.redirect(`${process.env.FRONTEND_URL}?error=auth_failed`);
     }
     if (!user) {
@@ -25,20 +25,22 @@ router.get("/github/callback", (req, res, next) => {
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
+
+    // Set httpOnly cookie — NOT exposed in URL (security fix)
     res.cookie("token", token, {
       httpOnly: true,
-      secure: isProd, // true in prod, false locally
-      sameSite: isProd ? "none" : "lax", // "none" in prod, "lax" locally
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
       path: "/",
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
-    // Redirect to FRONTEND, passing the token
-    return res.redirect(
-      `${process.env.FRONTEND_URL}/auth/callback?token=${token}`,
-    );
+    // Redirect to frontend WITHOUT token in the URL
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/callback`);
   })(req, res, next);
 });
 
+// Retained for potential direct token exchange use cases
 router.post("/set-cookie", (req, res) => {
   const { token } = req.body;
 
@@ -65,9 +67,7 @@ router.get("/logout", (req, res) => {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? "none" : "lax",
-    maxAge: 24 * 60 * 60 * 1000,
   });
-
   res.status(200).json({ message: "Logout successful" });
 });
 

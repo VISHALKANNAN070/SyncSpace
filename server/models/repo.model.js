@@ -17,5 +17,8 @@ const repoSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// Prevent duplicate repos per user (guards against race conditions)
+repoSchema.index({ userId: 1, repoId: 1 }, { unique: true });
+
 const Repo = mongoose.model("Repo", repoSchema);
 export default Repo;

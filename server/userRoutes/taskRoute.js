@@ -5,34 +5,62 @@ import Task from "../models/task.model.js";
 const router = express.Router();
 
 router.post("/:repoId", verifyToken, async (req, res) => {
-  const { repoId } = req.params;
-  const { text } = req.body;
+  try {
+    const { repoId } = req.params;
+    const { text } = req.body;
 
-  const todo = await Task.create({
-    userId: req.user._id,
-    repoId,
-    text,
-  });
-  res.json(todo);
+    if (!text?.trim()) {
+      return res.status(400).json({ error: "Task text is required" });
+    }
+
+    const todo = await Task.create({
+      userId: req.user._id,
+      repoId,
+      text: text.trim(),
+    });
+    res.status(201).json(todo);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 router.get("/:repoId", verifyToken, async (req, res) => {
-  const todos = await Task.find({
-    userId: req.user._id,
-    repoId: req.params.repoId,
-  });
-  res.json(todos);
+  try {
+    const todos = await Task.find({
+      userId: req.user._id,
+      repoId: req.params.repoId,
+    });
+    res.json(todos);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 router.patch("/:id", verifyToken, async (req, res) => {
-  const todo = await Task.findById(req.params.id);
-  todo.completed = !todo.completed;
-  await todo.save();
-  res.json(todo);
+  try {
+    const todo = await Task.findById(req.params.id);
+    if (!todo) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+    todo.completed = !todo.completed;
+    await todo.save();
+    res.json(todo);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
+
 router.delete("/:id", verifyToken, async (req, res) => {
-  await Task.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
+  try {
+    await Task.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 export default router;
