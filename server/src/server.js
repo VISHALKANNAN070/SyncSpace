@@ -5,11 +5,12 @@ import passport from "passport";
 import cookieParser from "cookie-parser";
 
 import connectDB from "./config/database.js";
-import loginRoute from "./authRoutes/authRoute.js";
-import homeRoute from "./userRoutes/homeRoute.js";
-import repoRoute from "./userRoutes/repoRoute.js";
-import noteRoute from "./userRoutes/noteRoute.js";
-import taskRoute from "./userRoutes/taskRoute.js";
+import loginRoute from "./routes/auth.route.js";
+import homeRoute from "./routes/home.route.js";
+import repoRoute from "./routes/repo.route.js";
+import noteRoute from "./routes/note.route.js";
+import taskRoute from "./routes/task.route.js";
+import aiRoute from "./routes/ai.route.js"
 
 // Load env
 dotenv.config();
@@ -19,7 +20,7 @@ const app = express();
 const PORT = 5000;
 
 // Passport configuration
-await import("./middleware/passport.js");
+import("./middlewares/passport.js");
 
 //Middleware
 app.set("trust proxy", 1);
@@ -32,11 +33,12 @@ app.use(passport.initialize());
 connectDB();
 
 // Routes
-app.use("/auth", loginRoute);
-app.use("/user-data", homeRoute);
+app.use("/api/auth", loginRoute);
+app.use("/api/home", homeRoute);
 app.use("/api/repo", repoRoute);
 app.use("/api/note", noteRoute);
 app.use("/api/task", taskRoute);
+app.use("/api/ai",aiRoute)
 
 // Health check
 app.get("/", (req, res) => {

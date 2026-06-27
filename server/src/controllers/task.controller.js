@@ -1,66 +1,66 @@
-import express from "express";
-import verifyToken from "../middleware/verifyToken.js";
 import Task from "../models/task.model.js";
 
-const router = express.Router();
-
-router.post("/:repoId", verifyToken, async (req, res) => {
+export const createTask = async (req, res) => {
   try {
     const { repoId } = req.params;
-    const { text } = req.body;
+    const { task } = req.body;
 
-    if (!text?.trim()) {
+    if (!task?.trim()) {
       return res.status(400).json({ error: "Task text is required" });
     }
 
     const todo = await Task.create({
       userId: req.user._id,
       repoId,
-      text: text.trim(),
+      task: task.trim(),
     });
     res.status(201).json(todo);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
-});
+};
 
-router.get("/:repoId", verifyToken, async (req, res) => {
+export const getAllTasks = async (req, res) => {
   try {
+    const { repoId } = req.params;
+    const userId = req.user._id;
     const todos = await Task.find({
-      userId: req.user._id,
-      repoId: req.params.repoId,
+      userId,
+      repoId,
     });
-    res.json(todos);
+    res.status(200).json(todos);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
-});
+};
 
-router.patch("/:id", verifyToken, async (req, res) => {
+export const patchTask = async (req, res) => {
   try {
-    const todo = await Task.findById(req.params.id);
+    const { _id, repoId } = req.params;
+    const userId = req.user._id;
+    const todo = await Task.findOne({_id, repoId,userId});
     if (!todo) {
       return res.status(404).json({ error: "Task not found" });
     }
     todo.completed = !todo.completed;
     await todo.save();
-    res.json(todo);
+    return res.status(200).json(todo);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
-});
+};
 
-router.delete("/:id", verifyToken, async (req, res) => {
+export const deleteTask = async (req, res) => {
   try {
-    await Task.findByIdAndDelete(req.params.id);
-    res.json({ message: "Deleted" });
+    const { _id, repoId } = req.params;
+    const userId = req.user._id;
+    await Task.findOneAndDelete(_id, repoId, userId);
+    res.json({ message: "Task Deleted Successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
-});
-
-export default router;
+};

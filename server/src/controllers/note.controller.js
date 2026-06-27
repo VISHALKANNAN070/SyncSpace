@@ -1,11 +1,6 @@
-import express from "express";
-import verifyToken from "../middleware/verifyToken.js";
 import Note from "../models/note.model.js";
 
-const router = express.Router();
-
-// Create note for a repo
-router.post("/:repoId", verifyToken, async (req, res) => {
+export const createNote = async (req, res) => {
   try {
     const { repoId } = req.params;
     const { title, content } = req.body;
@@ -15,10 +10,9 @@ router.post("/:repoId", verifyToken, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
+};
 
-// Get notes for a repo
-router.get("/:repoId", verifyToken, async (req, res) => {
+export const getAllNotes = async (req, res) => {
   try {
     const { repoId } = req.params;
     const userId = req.user._id;
@@ -28,18 +22,34 @@ router.get("/:repoId", verifyToken, async (req, res) => {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
-});
+};
 
-// Delete note
-router.delete("/:_id", verifyToken, async (req, res) => {
+export const updateNote = async (req, res) => {
   try {
-    const { _id } = req.params;
+    const { _id, repoId } = req.params;
     const userId = req.user._id;
-    await Note.findOneAndDelete({ userId, _id });
+    const { title, content } = req.body;
+    const note = await Note.findOneAndUpdate(
+      { _id, repoId, userId },
+      { title, content },
+      { new: true },
+    );
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+    return res.status(200).json(note);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteNote = async (req, res) => {
+  try {
+    const { _id, repoId } = req.params;
+    const userId = req.user._id;
+    await Note.findOneAndDelete({ _id, repoId, userId });
     res.json({ message: "Note deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
-
-export default router;
+};

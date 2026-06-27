@@ -33,13 +33,13 @@ const App = () => {
 
   // OAuth login
   const handleGitHubLogin = () => {
-    window.location.href = import.meta.env.VITE_BACKEND_URL + "/auth/github";
+    window.location.href = import.meta.env.VITE_BACKEND_URL + "/api/auth/github";
   };
 
   // Logout
   const handleLogout = async () => {
     try {
-      await axios.get(import.meta.env.VITE_BACKEND_URL + "/auth/logout", {
+      await axios.get(import.meta.env.VITE_BACKEND_URL + "/api/auth/logout", {
         withCredentials: true,
       });
     } catch (err) {
@@ -71,7 +71,7 @@ const App = () => {
 
   // Skip fetchData on auth callback — AuthCallback handles it
   useEffect(() => {
-    if (location.pathname === "/auth/callback") {
+    if (location.pathname === "/api/auth/callback") {
       setLoading(false);
       return;
     }
@@ -106,7 +106,7 @@ const App = () => {
     return (
       <Routes>
         <Route
-          path="/auth/callback"
+          path="/api/auth/callback"
           element={<AuthCallback fetchData={fetchData} darkMode={darkMode} />}
         />
         <Route

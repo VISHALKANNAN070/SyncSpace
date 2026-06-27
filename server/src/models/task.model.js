@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const taskSchema = mongoose.Schema(
+const taskSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -12,7 +12,7 @@ const taskSchema = mongoose.Schema(
       ref: "Repo",
       required: true,
     },
-    text: {
+    task: {
       type: String,
       required: true,
     },
