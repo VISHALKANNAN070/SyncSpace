@@ -57,7 +57,7 @@ const NotesPanel = ({ notes, darkMode, onAdd, onDelete }) => {
             </button>
             <button
               onClick={() => setShowInput(false)}
-              className={`border border-red-500 cursor-pointer ${buttonCls}`}
+              className={`cursor-pointer ${buttonCls} border-red-500 hover:border-red-500`}
             >
               Cancel
             </button>

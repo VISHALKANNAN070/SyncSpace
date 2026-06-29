@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, Folder, Sun, Moon, LogOut, User } from "lucide-react";
 import { getThemeClasses } from "../theme";
 import { saveRepo } from "../api/projects";
@@ -13,7 +13,10 @@ const Sidebar = ({
   onSelectProject,
   sidebarToggle,
 }) => {
-  const { id } = useParams();
+  const location = useLocation();
+  const id = location.pathname.startsWith("/project/")
+    ? location.pathname.split("/")[2]
+    : undefined;
   const navigate = useNavigate();
   const { bg, hoverBg, iconCls, textCls, mutedCls } =
     getThemeClasses(darkMode);
@@ -92,7 +95,7 @@ const Sidebar = ({
                 >
                   Projects
                 </div>
-                <div className="h-[calc(100%-28px)] overflow-y-auto">
+                <div className={`h-[calc(100%-28px)] overflow-y-auto scrollbar ${darkMode ? "scrollbar-dark" : "scrollbar-light"}`}>
                   <div className="space-y-0.5">
                     {userData?.repos?.map((repo) => {
                       const isActive = String(repo.id) === id;

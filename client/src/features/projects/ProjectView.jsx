@@ -9,6 +9,7 @@ import {
   createTask,
   toggleTask,
   deleteTask,
+  saveRepo,
 } from "../../api/projects";
 import TaskPanel from "./TaskPanel";
 import NotesPanel from "./NotesPanel";
@@ -39,6 +40,12 @@ const ProjectView = ({ userData, darkMode }) => {
       .then(setTasks)
       .catch((err) => console.error(err));
   }, [id]);
+
+  useEffect(() => {
+    if (project) {
+      saveRepo(project).catch((err) => console.error(err));
+    }
+  }, [project]);
 
   const handleCopy = () => {
     navigator.clipboard?.writeText(project?.clone_url || project?.html_url);

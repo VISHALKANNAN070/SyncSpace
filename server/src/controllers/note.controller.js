@@ -16,7 +16,7 @@ export const getAllNotes = async (req, res) => {
   try {
     const { repoId } = req.params;
     const userId = req.user._id;
-    const notes = await Note.find({ userId, repoId: String(repoId) });
+    const notes = await Note.find({ userId, repoId });
     res.status(200).json(notes);
   } catch (err) {
     res.status(500).json({ error: err.message });
