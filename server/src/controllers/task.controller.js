@@ -40,7 +40,7 @@ export const patchTask = async (req, res) => {
   try {
     const { _id, repoId } = req.params;
     const userId = req.user._id;
-    const todo = await Task.findOne({_id, repoId,userId});
+    const todo = await Task.findOne({ _id, repoId, userId });
     if (!todo) {
       return res.status(404).json({ error: "Task not found" });
     }
@@ -57,7 +57,7 @@ export const deleteTask = async (req, res) => {
   try {
     const { _id, repoId } = req.params;
     const userId = req.user._id;
-    await Task.findOneAndDelete(_id, repoId, userId);
+    await Task.findOneAndDelete({ _id, repoId, userId });
     res.json({ message: "Task Deleted Successfully" });
   } catch (err) {
     console.error(err);

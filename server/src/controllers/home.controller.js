@@ -28,7 +28,6 @@ export const fetchRepos = async (req, res) => {
       .status(200)
       .json({ message: "Repos received", username, email, repos });
   } catch (err) {
-    console.error(err);
     return res.status(500).json({ message: "Failed to fetch repos" });
   }
 };

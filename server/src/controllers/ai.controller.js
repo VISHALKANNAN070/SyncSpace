@@ -63,6 +63,6 @@ export const brainstorm = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ message: "Output generation failed", error: error.message });
+      .json({ message: "Output generation failed" });
   }
 };

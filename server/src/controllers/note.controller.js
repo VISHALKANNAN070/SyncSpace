@@ -19,7 +19,6 @@ export const getAllNotes = async (req, res) => {
     const notes = await Note.find({ userId, repoId: String(repoId) });
     res.status(200).json(notes);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };

@@ -1,214 +1,166 @@
-import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import {
-  Menu,
-  Pencil,
-  Search,
-  Folder,
-  Sun,
-  Moon,
-  LogOut,
-  User,
-} from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Menu, Folder, Sun, Moon, LogOut, User } from "lucide-react";
+import { getThemeClasses } from "../theme";
+import { saveRepo } from "../api/projects";
 
 const Sidebar = ({
   userData,
   darkMode,
+  toggleDarkMode,
   open,
   onToggle,
   onLogout,
-  onToggleDarkMode,
   onSelectProject,
   sidebarToggle,
 }) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { bg, hoverBg, iconCls, textCls, mutedCls } =
+    getThemeClasses(darkMode);
+  const sbBorder = darkMode ? "border-gray-800" : "border-gray-200";
 
   const handleRepoClick = async (repo) => {
     onSelectProject(repo);
     try {
-      await axios.post(
-        import.meta.env.VITE_BACKEND_URL + "/api/repo",
-        {
-          repoId: repo.id,
-          name: repo.name,
-          url: repo.html_url,
-        },
-        { withCredentials: true },
-      );
+      await saveRepo(repo);
     } catch (err) {
       console.error(err.message);
     }
   };
 
-  const border = darkMode ? "border-gray-800" : "border-gray-200";
-  const bg = darkMode ? "bg-gray-900" : "bg-white";
-  const hoverBg = darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100";
-  const iconCls = darkMode ? "text-white" : "text-gray-900";
-  const textCls = darkMode ? "text-gray-200" : "text-gray-800";
-  const mutedCls = "text-gray-500";
-
   return (
-    <aside
-      className={`
-        fixed left-0 top-0 h-screen z-30
-        border-r overflow-hidden
-        transition-[width] duration-200 ease-out
-        ${open ? "w-64" : "w-14"}
-        ${bg} ${border}
-      `}
-    >
-      <div className="h-full flex flex-col py-2">
-        {/* ── TOP BAR ── */}
-        <div
-          className={`flex items-center px-2 mb-1 shrink-0 ${open ? "" : "justify-center"}`}
-        >
-          {/* Hamburger — always visible */}
-          <button
-            onClick={onToggle}
-            className={`p-2 rounded shrink-0 ${hoverBg}`}
-            aria-label="Toggle sidebar"
-          >
-            <Menu className={`w-5 h-5 ${iconCls}`} />
-          </button>
+    <>
+      <button
+        onClick={onToggle}
+        className="fixed top-4 right-4 z-40 p-1.5 rounded"
+        aria-label="Toggle sidebar"
+      >
+        <Menu className={`w-5 h-5 ${iconCls}`} />
+      </button>
 
-          {/* Dark-mode toggle — removed from flow when collapsed so it can't shift hamburger */}
+      {open && (
+        <div
+          className="fixed inset-0 z-20 bg-black/50"
+          onClick={sidebarToggle}
+        />
+      )}
+
+      <aside
+        className={`
+          fixed right-0 top-0 h-screen z-30
+          border-l overflow-hidden
+          transition-[width] duration-200 ease-out
+          ${open ? "w-64" : "w-0"}
+          ${bg} ${sbBorder}
+        `}
+      >
+        <div className="h-full flex flex-col py-2">
           {open && (
-            <div className="ml-auto mr-1 shrink-0">
+            <div className="flex items-center justify-between px-2 mb-2 shrink-0">
               <button
-                onClick={onToggleDarkMode}
-                className={`p-2 rounded ${hoverBg}`}
+                onClick={toggleDarkMode}
+                className={`p-2 rounded mt-2 ${hoverBg}`}
                 aria-label="Toggle dark mode"
               >
                 {darkMode ? (
-                  <Sun className="w-4 h-4 text-white" />
+                  <Sun className="w-5 h-5 text-white" />
                 ) : (
-                  <Moon className="w-4 h-4 text-gray-900" />
+                  <Moon className="w-5 h-5 text-gray-900" />
                 )}
               </button>
             </div>
           )}
-        </div>
 
-        {/* ── NAV ── */}
-        <nav className="flex flex-col gap-0.5 px-2 shrink-0">
-          <SidebarItem
-            icon={Folder}
-            label="Home"
-            open={open}
-            darkMode={darkMode}
-            onClick={() => {
-              sidebarToggle();
-              navigate("/home");
-            }}
-          />
-          <SidebarItem
-            icon={Pencil}
-            label="New Project"
-            open={open}
-            darkMode={darkMode}
-          />
-          <SidebarItem
-            icon={Search}
-            label="Search"
-            open={open}
-            darkMode={darkMode}
-          />
-          <SidebarItem
-            icon={Folder}
-            label="Projects"
-            open={open}
-            darkMode={darkMode}
-          />
-        </nav>
+          <nav className="flex flex-col gap-0.5 px-2 shrink-0">
+            <SidebarItem
+              icon={Folder}
+              label="Home"
+              open={open}
+              darkMode={darkMode}
+              onClick={() => {
+                sidebarToggle();
+                navigate("/home");
+              }}
+            />
+          </nav>
 
-        {/* ── PROJECT LIST ── */}
-        <div className="flex-1 min-h-0 mt-4 px-2">
-          {open && (
-            <>
-              <div
-                className={`px-2 mb-2 text-xs uppercase tracking-wide ${mutedCls}`}
-              >
-                Projects
-              </div>
-              <div className="h-[calc(100%-28px)] overflow-y-auto">
-                <div className="space-y-0.5">
-                  {userData?.repos?.map((repo) => {
-                    const isActive = String(repo.id) === id;
-                    return (
-                      <button
-                        key={repo.id}
-                        onClick={() => {
-                          handleRepoClick(repo);
-                          sidebarToggle();
-                        }}
-                        className={`
-                          w-full flex items-center px-2 py-2 rounded text-left text-sm
-                          transition-colors duration-100
-                          ${
-                            isActive
-                              ? darkMode
-                                ? "bg-gray-700 text-white"
-                                : "bg-gray-200 text-gray-900"
-                              : darkMode
-                                ? `${textCls} hover:bg-gray-800`
-                                : `${textCls} hover:bg-gray-100`
-                          }
-                        `}
-                      >
-                        <Folder
-                          className={`w-4 h-4 shrink-0 ${
-                            isActive
-                              ? darkMode
-                                ? "text-white"
-                                : "text-gray-900"
-                              : mutedCls
-                          }`}
-                        />
-                        <span className="ml-2 truncate text-sm">
-                          {repo.name}
-                        </span>
-                      </button>
-                    );
-                  })}
+          <div className="flex-1 min-h-0 mt-4 px-2">
+            {open && (
+              <>
+                <div
+                  className={`px-2 mb-2 text-xs uppercase tracking-wide ${mutedCls}`}
+                >
+                  Projects
                 </div>
-              </div>
-            </>
-          )}
-        </div>
+                <div className="h-[calc(100%-28px)] overflow-y-auto">
+                  <div className="space-y-0.5">
+                    {userData?.repos?.map((repo) => {
+                      const isActive = String(repo.id) === id;
+                      return (
+                        <button
+                          key={repo.id}
+                          onClick={() => {
+                            handleRepoClick(repo);
+                            sidebarToggle();
+                          }}
+                          className={`
+                            w-full flex items-center px-2 py-2 rounded text-left text-sm
+                            transition-colors duration-100
+                            ${
+                              isActive
+                                ? darkMode
+                                  ? "bg-gray-700 text-white"
+                                  : "bg-gray-200 text-gray-900"
+                                : darkMode
+                                  ? `${textCls} hover:bg-gray-800`
+                                  : `${textCls} hover:bg-gray-100`
+                            }
+                          `}
+                        >
+                          <Folder
+                            className={`w-5 h-5 shrink-0 ${
+                              isActive
+                                ? darkMode
+                                  ? "text-white"
+                                  : "text-gray-900"
+                                : mutedCls
+                            }`}
+                          />
+                          <span className="ml-2 truncate text-sm">
+                            {repo.name}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
 
-        {/* ── USER / LOGOUT ── */}
-        <div className="px-2 pt-2 mt-auto shrink-0">
-          {open ? (
-            /* Expanded: avatar + name + logout */
-            <div
-              className={`flex items-center gap-2 px-2 py-1.5 rounded ${hoverBg}`}
-            >
-              <Avatar username={userData?.username} darkMode={darkMode} />
-              <span className={`text-sm truncate flex-1 ${textCls}`}>
-                {userData?.username || "User"}
-              </span>
-              <button
-                onClick={onLogout}
-                className="p-1 rounded hover:bg-red-500/10 shrink-0"
-                aria-label="Logout"
-              >
-                <LogOut className="w-4 h-4 text-red-500" />
-              </button>
-            </div>
-          ) : (
-            /* Collapsed: avatar only, centered */
-            <div className="flex justify-center py-1">
-              <Avatar username={userData?.username} darkMode={darkMode} />
+          {open && (
+            <div className="px-2 pt-2 mt-auto shrink-0">
+              <div className={`flex items-center gap-2 px-2 py-1.5 rounded ${hoverBg}`}>
+                <Avatar username={userData?.username} darkMode={darkMode} />
+                <span className={`text-sm truncate flex-1 ${textCls}`}>
+                  {userData?.username || "User"}
+                </span>
+                <button
+                  onClick={onLogout}
+                  className="p-1 rounded hover:bg-red-500/10 shrink-0"
+                  aria-label="Logout"
+                >
+                  <LogOut className="w-5 h-5 text-red-500" />
+                </button>
+              </div>
             </div>
           )}
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 
-/* ── Avatar ── */
 const Avatar = ({ username, darkMode }) => (
   <div
     className={`
@@ -222,31 +174,33 @@ const Avatar = ({ username, darkMode }) => (
   </div>
 );
 
-/* ── SidebarItem ── */
-const SidebarItem = ({ icon: Icon, label, open, darkMode, onClick }) => (
-  <button
-    onClick={onClick}
-    className={`
-      w-full flex items-center p-2 rounded
-      transition-colors duration-100
-      ${open ? "" : "justify-center"}
-      ${darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"}
-    `}
-  >
-    <Icon
-      className={`w-5 h-5 shrink-0 ${darkMode ? "text-white" : "text-gray-900"}`}
-    />
-    <span
+const SidebarItem = ({ icon, label, open, darkMode, onClick }) => {
+  const Icon = icon;
+  return (
+    <button
+      onClick={onClick}
       className={`
-        ml-3 text-sm whitespace-nowrap overflow-hidden
-        transition-opacity duration-150
-        ${darkMode ? "text-white" : "text-gray-900"}
-        ${open ? "opacity-100 max-w-xs" : "opacity-0 max-w-0 ml-0"}
+        w-full flex items-center p-2 rounded
+        transition-colors duration-100
+        ${open ? "" : "justify-center"}
+        ${darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"}
       `}
     >
-      {label}
-    </span>
-  </button>
-);
+      <Icon
+        className={`w-5 h-5 shrink-0 ${darkMode ? "text-white" : "text-gray-900"}`}
+      />
+      <span
+        className={`
+          ml-3 text-sm whitespace-nowrap overflow-hidden
+          transition-opacity duration-150
+          ${darkMode ? "text-white" : "text-gray-900"}
+          ${open ? "opacity-100 max-w-xs" : "opacity-0 max-w-0 ml-0"}
+        `}
+      >
+        {label}
+      </span>
+    </button>
+  );
+};
 
 export default Sidebar;

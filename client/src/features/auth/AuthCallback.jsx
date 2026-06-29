@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 const AuthCallback = ({ fetchData, darkMode }) => {
   const navigate = useNavigate();
-  // Guard against StrictMode double-invocation in development
   const called = useRef(false);
 
   useEffect(() => {
@@ -18,7 +17,6 @@ const AuthCallback = ({ fetchData, darkMode }) => {
         return navigate("/?error=auth_failed");
       }
 
-      // Cookie is already set by the backend redirect — just verify session
       const success = await fetchData();
       if (success) {
         navigate("/home");

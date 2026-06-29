@@ -54,7 +54,7 @@ export const brainStormAI = async (userInput) => {
 
   return response.data.choices[0].message.content;
   } catch (error) {
-    console.log(error.response?.data)
+    console.log(error)
     throw error
   }
 };
