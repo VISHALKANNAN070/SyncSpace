@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getThemeClasses } from "../../theme";
 import { brainstormAPI } from "../../api/ai";
 
@@ -19,6 +19,15 @@ const BrainStorm = ({ repoId, darkMode, onPushToTask, onPushToNote }) => {
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
   const [selected, setSelected] = useState(new Set());
+
+  useEffect(() => {
+    setOpen(false);
+    setInput("");
+    setLoading(false);
+    setError(null);
+    setResults(null);
+    setSelected(new Set());
+  }, [repoId]);
 
   const handleSubmit = async () => {
     if (!input.trim()) return;
